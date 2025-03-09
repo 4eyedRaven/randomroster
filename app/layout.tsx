@@ -5,6 +5,7 @@ import "../styles/globals.css";
 import ClientWrapper from "../components/ClientWrapper";
 import CookieConsent from "../components/CookieConsent";
 import Footer from "@/components/Footer";
+import { Suspense } from "react";
 
 // Import Geist as a local font
 const geist = localFont({
@@ -19,7 +20,6 @@ const geist = localFont({
       weight: '700',
       style: 'normal',
     },
-    // Add other weights/styles as needed
   ],
   variable: '--font-geist',
   display: 'swap',
@@ -38,12 +38,12 @@ const geistMono = localFont({
       weight: '700',
       style: 'normal',
     },
-    // Add other weights/styles as needed
   ],
   variable: '--font-geist-mono',
   display: 'swap',
 });
 
+// Remove themeColor from metadata and add a separate viewport export.
 export const metadata: Metadata = {
   title: "Random Roster",
   description: "Random Roster is a web app for managing classes and generating randomized rosters.",
@@ -55,8 +55,12 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-touch-icon.png",
   },
-  themeColor: "#ffffff",
   manifest: "/site.webmanifest",
+};
+
+// New viewport export for themeColor
+export const viewport = {
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -66,7 +70,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geist.variable} ${geistMono.variable}`}>
         <ClientWrapper>
-          {children}
+          <Suspense fallback={<div>Loading...</div>}>
+            {children}
+          </Suspense>
         </ClientWrapper>
         <CookieConsent />
         <Footer />
