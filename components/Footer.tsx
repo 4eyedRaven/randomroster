@@ -10,22 +10,6 @@ export default function Footer() {
       <nav>
         <PrivacyPolicyPopover />
       </nav>
-      <style jsx>{`
-        .footer {
-          padding: 1rem;
-          background-color: var(--border-color);
-          color: var(--text-color);
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-        .footer nav {
-          display: flex;
-          justify-content: center;
-          gap: 1rem;
-        }
-      `}</style>
     </footer>
   );
 }

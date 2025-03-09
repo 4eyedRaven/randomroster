@@ -24,7 +24,7 @@ export default function LoginPage() {
     <Suspense fallback={<div>Loading...</div>}>
       <div className="container">
         <main>
-          <h1>Random Roster</h1>
+          <h1 className="title">Random Roster</h1>
           {emailConfirmationSent && !errorMessage && (
             <div className="notification">
               A confirmation email has been sent to your inbox. Please click the link in the email to complete your registration.

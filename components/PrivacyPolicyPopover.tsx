@@ -68,49 +68,6 @@ export default function PrivacyPolicyPopover() {
               <a href="mailto:contactjoshloughran@gmail.com">contactjoshloughran@gmail.com</a>.
             </p>
           </div>
-          <style jsx>{`
-            .popover-overlay {
-              position: fixed;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              background: rgba(0, 0, 0, 0.7);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              z-index: 1000;
-            }
-            .popover-container {
-              background: var(--bg-color);
-              color: var(--text-color);
-              padding: 2rem;
-              border-radius: 8px;
-              max-width: 600px;
-              width: 90%;
-              max-height: 90vh;
-              overflow-y: auto;
-              position: relative;
-            }
-            .popover-close {
-              position: absolute;
-              top: 10px;
-              right: 10px;
-              background: transparent;
-              border: none;
-              font-size: 2rem;
-              color: var(--text-color);
-              cursor: pointer;
-            }
-            .footer-link {
-              color: var(--primary-color);
-              text-decoration: none;
-              cursor: pointer;
-            }
-            .footer-link:hover {
-              text-decoration: underline;
-            }
-          `}</style>
         </div>
       )}
     </>

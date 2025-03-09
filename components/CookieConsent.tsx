@@ -1,4 +1,4 @@
-// components/CookieConsent.tsx
+// CookieConsent.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -28,38 +28,11 @@ export default function CookieConsent() {
 
   return (
     <div className="cookie-banner">
-      <p>
-        We use cookies strictly for authentication and session management.
-        By using our site, you accept our cookie policy.
-      </p>
+      <p>We use cookies strictly for authentication and session management. By using our site, you accept our cookie policy.</p>
       <div>
         <button onClick={handleAccept}>Accept</button>
         <button onClick={handleReject}>Reject</button>
       </div>
-      <style jsx>{`
-        .cookie-banner {
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          background: #333;
-          color: #fff;
-          padding: 1rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          z-index: 1000;
-        }
-        .cookie-banner button {
-          margin-left: 1rem;
-          background: var(--primary-color);
-          border: none;
-          padding: 0.5rem 1rem;
-          color: #fff;
-          border-radius: 4px;
-          cursor: pointer;
-        }
-      `}</style>
     </div>
   );
 }
