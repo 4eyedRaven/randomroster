@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import { logger } from '@/utils/logger';
 import ClassManager from './ClassManager';
 import StudentManager from './StudentManager';
 import GroupingTool from './GroupingTool';
@@ -27,7 +26,7 @@ export default function ClientHome() {
       if (user) {
         setUser(user);
       } else {
-        logger.error("No authenticated user found.");
+        console.error("No authenticated user found.");
       }
     }
     fetchUser();
@@ -42,7 +41,7 @@ export default function ClientHome() {
           .select('*, students(*)')
           .eq('user_id', user.id);
         if (error) {
-          logger.error("Error loading classes", error);
+          console.error("Error loading classes", error);
         } else {
           // Transform each class so that student records already use snake_case fields.
           // (In this refactor we now expect the database to return capability_level,
@@ -66,7 +65,7 @@ export default function ClientHome() {
       .insert([{ name: className, user_id: user.id }])
       .select();
     if (error) {
-      logger.error("Error adding class", error);
+      console.error("Error adding class", error);
     } else {
       const newClass = data[0];
       setClasses([...classes, newClass]);
@@ -81,7 +80,7 @@ export default function ClientHome() {
       .delete()
       .eq('id', classId);
     if (error) {
-      logger.error("Error removing class", error);
+      console.error("Error removing class", error);
     } else {
       const updatedClasses = classes.filter((c) => c.id !== classId);
       setClasses(updatedClasses);
@@ -98,7 +97,7 @@ export default function ClientHome() {
       .update({ name: newName })
       .eq('id', classId);
     if (error) {
-      logger.error("Error renaming class", error);
+      console.error("Error renaming class", error);
     } else {
       const updatedClasses = classes.map((c) =>
         c.id === classId ? { ...c, name: newName } : c
@@ -115,7 +114,7 @@ export default function ClientHome() {
       .insert([{ class_id: currentClassId, name, capability_level, present: true }])
       .select();
     if (error) {
-      logger.error("Error adding student", error);
+      console.error("Error adding student", error);
     } else {
       const newStudent = data[0];
       const updatedClasses = classes.map((c) =>
@@ -135,7 +134,7 @@ export default function ClientHome() {
       .delete()
       .eq('id', studentId);
     if (error) {
-      logger.error("Error removing student", error);
+      console.error("Error removing student", error);
     } else {
       const updatedClasses = classes.map((c) =>
         c.id === currentClassId
@@ -159,7 +158,7 @@ export default function ClientHome() {
       .update({ present: newPresent })
       .eq('id', studentId);
     if (error) {
-      logger.error("Error toggling student presence", error);
+      console.error("Error toggling student presence", error);
     } else {
       const updatedClasses = classes.map((c) =>
         c.id === currentClassId
