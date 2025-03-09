@@ -1,7 +1,7 @@
 // components/GroupHistory.tsx
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import EditableGroupName from './EditableGroupName';
 import Droppable from './Droppable';
@@ -24,8 +24,8 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
   const [draggedStudentId, setDraggedStudentId] = useState<string | null>(null);
   const [groupingId, setGroupingId] = useState<string | null>(null);
 
-  // Fetch grouping history from Supabase for the current class.
-  const fetchGroupingHistory = async () => {
+  // Wrap fetchGroupingHistory in useCallback
+  const fetchGroupingHistory = useCallback(async () => {
     if (!currentClassId) {
       setGroupHistory([]);
       return;
@@ -40,11 +40,11 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
     } else if (data) {
       setGroupHistory(data as GroupingHistoryEntry[]);
     }
-  };
+  }, [currentClassId, supabase]);
 
   useEffect(() => {
     fetchGroupingHistory();
-  }, [currentClassId, refreshKey]);
+  }, [fetchGroupingHistory, refreshKey]);
 
   // Load a specific grouping for editing.
   const loadGrouping = (grouping: GroupingHistoryEntry) => {
@@ -116,7 +116,7 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
   };
 
   // Update the grouping history record in Supabase.
-  const saveGroupingHistory = async () => {
+  const saveGroupingHistory = useCallback(async () => {
     if (!currentClassId || !groupingId) {
       console.error('GroupHistory: Missing currentClassId or groupingId. Cannot save grouping history.');
       return;
@@ -141,7 +141,17 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
       console.log("Grouping history updated successfully.");
       fetchGroupingHistory();
     }
-  };
+  }, [currentClassId, groupingId, groups, groupNames, supabase, fetchGroupingHistory]);
+
+  // Wrap closeModal in useCallback so it can be used in useEffect
+  const closeModal = useCallback(async () => {
+    if (groupingId !== null) {
+      await saveGroupingHistory();
+    }
+    setSelectedGrouping(null);
+    setGroupingId(null);
+    setDraggedStudentId(null);
+  }, [groupingId, saveGroupingHistory]);
 
   // Delete a grouping history record from Supabase.
   const handleDeleteGrouping = async (groupingIdToDelete: string) => {
@@ -169,15 +179,6 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
     }
   };
 
-  const closeModal = async () => {
-    if (groupingId !== null) {
-      await saveGroupingHistory();
-    }
-    setSelectedGrouping(null);
-    setGroupingId(null);
-    setDraggedStudentId(null);
-  };
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -192,7 +193,7 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
       document.body.style.overflow = 'auto';
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selectedGrouping]);
+  }, [selectedGrouping, closeModal]);
 
   const handleGroupNameChange = (groupIndex: number, newName: string) => {
     setGroupNames(prev => ({ ...prev, [groupIndex]: newName }));

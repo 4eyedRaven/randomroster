@@ -23,10 +23,7 @@ export default function PrivacyPolicyPopover() {
 
       {showPopover && (
         <div className="popover-overlay" onClick={handleClose}>
-          <div
-            className="popover-container"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="popover-container" onClick={(e) => e.stopPropagation()}>
             <button className="popover-close" onClick={handleClose} aria-label="Close">
               &times;
             </button>
@@ -35,7 +32,7 @@ export default function PrivacyPolicyPopover() {
               <strong>Effective Date:</strong> 2025-03-08
             </p>
             <p>
-              Random Roster ("we", "us", "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our web application ("Service").
+              Random Roster (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our web application (&quot;Service&quot;).
             </p>
             <h3>Information We Collect</h3>
             <p>
@@ -67,7 +64,8 @@ export default function PrivacyPolicyPopover() {
             </p>
             <h3>Contact Us</h3>
             <p>
-              If you have any questions regarding this Privacy Policy, please contact us at <a href="mailto:contactjoshloughran@gmail.com">contactjoshloughran@gmail.com</a>.
+              If you have any questions regarding this Privacy Policy, please contact us at{" "}
+              <a href="mailto:contactjoshloughran@gmail.com">contactjoshloughran@gmail.com</a>.
             </p>
           </div>
           <style jsx>{`
