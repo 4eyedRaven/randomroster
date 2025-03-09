@@ -1,0 +1,860 @@
+/* styles/globals.css */
+
+/* ===========================
+   1. CSS Variables
+=========================== */
+:root {
+  /* Color Palette */
+  --bg-color: #1a1a1a;
+  --text-color: #ffffff;
+  --primary-color: #4a90e2;
+  --secondary-color: #50e3c2;
+  --accent-color: #f5a623;
+  --border-color: #333333;
+
+  /* Font Variables */
+  --font-geist-sans: 'Geist Sans', sans-serif;
+  --font-geist-mono: 'Geist Mono', monospace;
+}
+
+/* ===========================
+   2. Global Styles
+=========================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-geist-sans);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem; /* Reduced padding */
+}
+
+/* ===========================
+   3. Typography
+=========================== */
+h1,
+h2,
+h3 {
+  color: var(--primary-color);
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===========================
+   4. Buttons
+=========================== */
+button {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+  font-size: 1rem;
+}
+
+button:hover {
+  background-color: var(--secondary-color);
+}
+
+button:disabled {
+  background-color: var(--border-color);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===========================
+   5. Inputs and Forms
+=========================== */
+
+.login-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: rgba(51, 51, 51, 0.5);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.logout-button {
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.logout-button:hover {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+.error-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: rgba(51, 51, 51, 0.5);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.error-container h2 {
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+}
+
+.button {
+  display: inline-block;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin-top: 1.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: var(--secondary-color);
+  text-decoration: none;
+}
+input[type='text'],
+input[type='number'],
+input[type='email'],
+input[type='password'],
+select {
+  background-color: var(--border-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type='text']::placeholder,
+input[type='number']::placeholder {
+  color: #cccccc;
+}
+
+input[type='checkbox'] {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+input[type='text']:focus,
+input[type='number']:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 5px var(--primary-color);
+}
+
+/* ===========================
+   6. Class Manager Styles
+=========================== */
+.class-manager {
+  margin-bottom: 2rem;
+}
+
+.class-manager h2 {
+  margin-bottom: 1rem;
+}
+
+.class-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.class-item {
+  background-color: var(--border-color);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.class-item.active {
+  background-color: var(--secondary-color);
+  color: var(--bg-color);
+}
+
+.class-item:hover {
+  background-color: var(--secondary-color);
+  color: var(--bg-color);
+}
+
+.remove-btn {
+  background-color: transparent;
+  color: var(--text-color);
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0 0.5rem;
+}
+
+.remove-btn:hover {
+  color: var(--accent-color);
+}
+
+/* ====== Updated Styles for .add-class ====== */
+.add-class {
+  display: flex;
+  gap: 0.75rem; /* Increased gap for better spacing */
+  margin-top: 1rem; /* Space above the add-class container */
+}
+
+.add-class input[type='text'] {
+  flex: 1; /* Allows the input to take up available space */
+  padding: 0.5rem; /* Consistent padding */
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.add-class input[type='text'].input-error {
+  border-color: #e74c3c; /* Red border for errors */
+  box-shadow: 0 0 5px rgba(231, 76, 60, 0.5); /* Subtle red glow */
+}
+
+.add-class input[type='text']::placeholder {
+  color: #cccccc;
+}
+
+.add-class button {
+  padding: 0.5rem 1.2rem; /* Adjusted padding for better spacing */
+  font-size: 1.2rem; /* Ensures the "+" is adequately sized */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===========================
+   7. Info Button & Popover Styles
+=========================== */
+.client-home-container {
+  position: relative;
+}
+
+.info-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  z-index: 10;
+  font-style: italic;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.info-button:hover {
+  background-color: var(--secondary-color);
+  transform: scale(1.05);
+}
+
+.popover-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popover-container {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  border-radius: 8px;
+  background-color: var(--bg-color);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+}
+
+.instructions-popover {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: var(--text-color);
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.close-button:hover {
+  background-color: var(--border-color);
+}
+
+/* ===========================
+   8. Student Manager Styles
+=========================== */
+.student-manager {
+  margin-bottom: 2rem;
+}
+
+.student-manager h2 {
+  margin-bottom: 1rem;
+}
+
+.student-list {
+  margin-bottom: 1rem;
+}
+
+.student-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.student-list th,
+.student-list td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+  font-size: 0.95rem; /* Slightly smaller font for better fit */
+}
+
+.student-list th {
+  background-color: var(--border-color);
+}
+
+.student-list tr.excluded td {
+  opacity: 0.5;
+}
+
+.student-list tr:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.student-list .remove-btn {
+  background-color: transparent;
+  color: var(--text-color);
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.2rem 0.5rem;
+}
+
+.student-list .remove-btn:hover {
+  color: var(--accent-color);
+}
+
+.add-student {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.add-student input[type='text'],
+.add-student select {
+  flex: 1;
+}
+
+.add-student button {
+  flex-shrink: 0;
+}
+
+/* ===========================
+   9. Grouping Tool Styles
+=========================== */
+.grouping-tool {
+  margin-bottom: 2rem;
+}
+
+.grouping-tool h2 {
+  margin-bottom: 1rem;
+}
+
+.grouping-options {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.grouping-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.grouping-options input[type='radio'] {
+  cursor: pointer;
+}
+
+.group-count {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.group-count input[type='text'] {
+  width: 200px;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.group-count input[type='text'].input-error {
+  border-color: #e74c3c; /* Red border for errors */
+  box-shadow: 0 0 5px rgba(231, 76, 60, 0.5); /* Subtle red glow */
+}
+
+.group-count input[type='text']::placeholder {
+  color: #cccccc;
+}
+
+.error-message {
+  color: #e74c3c;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.grouping-tool button {
+  padding: 0.5rem 1rem;
+}
+
+/* ===========================
+   10. Modal Styles
+=========================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.modal-content {
+  background-color: var(--bg-color);
+  padding: 1rem; /* Increased padding for better content spacing */
+  border-radius: 8px;
+  max-width: 90vw; /* Use viewport width for better fit */
+  max-height: 90vh; /* Use viewport height to prevent overflow */
+  width: 800px; /* Keep a reasonable width */
+  position: relative;
+  color: var(--text-color);
+  cursor: default;
+  overflow-y: auto; /* Enable vertical scrolling if content overflows */
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background-color: transparent;
+  color: var(--text-color);
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.modal-close-btn:hover {
+  color: var(--accent-color);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: var(--primary-color);
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
+.groups-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem; /* Reduced gap */
+  margin-top: 1rem;
+  justify-content: center; /* Center the groups */
+}
+
+/* ===========================
+   11. Group Card Styles
+=========================== */
+.group-card {
+  background-color: var(--border-color);
+  padding: 0.5rem; /* Increased padding for better spacing */
+  border: 1px solid var(--border-color);
+  border-radius: 6px; /* Slightly reduced radius */
+  min-width: 120px; /* Further reduced min-width */
+  transition: background-color 0.2s, border 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.group-card:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.group-card h3 {
+  margin-top: 0;
+  color: var(--accent-color);
+  font-size: 1rem; /* Slightly increased font size for better readability */
+  cursor: pointer; /* Indicate that it's editable */
+}
+
+.group-card h3:hover {
+  color: var(--secondary-color); /* Visual feedback on hover */
+}
+
+.group-card ul {
+  list-style-type: none;
+  padding: 0;
+  min-height: 35px; /* Further reduced min-height */
+}
+
+.group-card li {
+  background-color: var(--border-color);
+  margin-bottom: 0.3rem; /* Further reduced margin */
+  padding: 0.25rem; /* Further reduced padding */
+  border-radius: 4px;
+  cursor: grab;
+  user-select: none;
+  transition: background-color 0.2s, opacity 0.2s;
+  font-size: 0.8rem; /* Further reduced font size */
+}
+
+.group-card li:active {
+  cursor: grabbing;
+}
+
+.group-card li.dragging {
+  background-color: var(--secondary-color);
+  color: var(--bg-color);
+  opacity: 0.8;
+}
+
+/* ===========================
+   12. Droppable Group Over Styles
+=========================== */
+.droppable.group-over .group-card {
+  border: 3px dashed var(--accent-color);
+  box-shadow: 0 0 10px var(--accent-color);
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ===========================
+   13. Draggable Student Styles
+=========================== */
+.draggable-student {
+  transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.draggable-student.dragging {
+  background-color: var(--accent-color); /* Desired background color during drag */
+  color: var(--bg-color); /* Optional: Change text color for better contrast */
+  opacity: 0.8; /* Optional: Slight transparency */
+  cursor: grabbing; /* Change cursor to indicate active drag */
+}
+
+/* ===========================
+   14. Editable Group Name Styles
+=========================== */
+.group-name {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.group-name:hover {
+  color: var(--secondary-color);
+}
+
+.group-name-input {
+  width: 100%;
+  padding: 0.3rem;
+  border: 1px solid var(--accent-color);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+}
+
+.group-name-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 5px var(--primary-color);
+}
+
+/* ===========================
+   15. Instructions Component Styles
+=========================== */
+.instructions {
+  background-color: var(--border-color);
+  color: var(--text-color);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.instructions h2 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.instructions p {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.instructions ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.instructions ol li {
+  margin-bottom: 0.75rem;
+}
+
+.instructions strong {
+  color: var(--accent-color);
+}
+
+/* ===========================
+   16. Responsive Design
+=========================== */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem; /* Further reduced padding */
+  }
+
+  .class-list,
+  .student-list,
+  .groups-display,
+  .group-history-table {
+    flex-direction: column;
+  }
+
+  .group-card {
+    min-width: auto;
+  }
+
+  .group-count input[type='text'] {
+    width: 100%;
+  }
+
+  .grouping-options {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .add-student {
+    flex-direction: column;
+  }
+
+  .add-student button {
+    width: 100%;
+  }
+
+  .grouping-tool button {
+    width: 100%;
+  }
+
+  .instructions {
+    padding: 1rem;
+  }
+
+  .instructions h2 {
+    font-size: 1.5rem;
+  }
+
+  .instructions p,
+  .instructions ol li {
+    font-size: 1rem;
+  }
+
+  /* Adjust modal-content for smaller screens */
+  .modal-content {
+    width: 95vw;
+    padding: 0.75rem; /* Further reduced padding */
+  }
+
+  /* Adjust group-card font sizes and padding */
+  .group-card h3 {
+    font-size: 1rem; /* Slightly increased font size for better readability */
+  }
+
+  .group-card li {
+    font-size: 0.8rem; /* Further reduced font size */
+    padding: 0.25rem; /* Further reduced padding */
+  }
+
+  .group-card {
+    padding: 0.4rem; /* Further reduced padding */
+    min-width: 120px; /* Further reduced min-width */
+  }
+
+  /* Adjust .groups-display to use CSS Grid */
+  .groups-display {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+    justify-items: center;
+  }
+
+  /* Adjust group-history-table for mobile */
+  .group-history-table th,
+  .group-history-table td {
+    padding: 0.5rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .logo {
+    filter: invert();
+  }
+}
+
+/* ===========================
+   17. Additional Enhancements
+=========================== */
+/* Cursor for Droppable Area */
+.group-card {
+  cursor: pointer;
+}
+
+.error-boundary {
+  padding: 2rem;
+  background-color: #ffdddd;
+  border: 1px solid #ff5c5c;
+  border-radius: 8px;
+  text-align: center;
+  color: #a94442;
+}
+
+/* ===========================
+   18. Group History Styles
+=========================== */
+.group-history {
+  margin-top: 2rem;
+}
+
+.group-history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.group-history-table th,
+.group-history-table td {
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.group-history-row {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.group-history-row:hover {
+  background-color: var(--secondary-color);
+  color: var(--bg-color);
+}
