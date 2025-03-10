@@ -8,7 +8,6 @@ import StudentManager from './StudentManager';
 import GroupingTool from './GroupingTool';
 import GroupHistory from './GroupHistory';
 import Instructions from './Instructions';
-import InfoButton from './InfoButton';
 import { Class } from '../types';
 
 export default function ClientHome() {
@@ -168,8 +167,6 @@ export default function ClientHome() {
 
   return (
     <div className="client-home-container">
-      <InfoButton visible={classes.length > 0} />
-
       <ClassManager
         classes={classes}
         currentClassId={currentClassId}
