@@ -53,10 +53,16 @@ body {
   padding: 1.5rem;
 }
 
-.title .title-description {
+.title,
+.title-description {
+  text-align: center;
+}
+
+.title-description {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  display: flex;
 }
 
 
@@ -1190,4 +1196,70 @@ select:focus {
   .grouping-tool button {
     width: 100%;
   }
+}
+
+/* ===========================
+   24. Hamburger Menu Styles
+=========================== */
+
+.hamburger-menu {
+  position: relative;
+}
+
+.hamburger-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.menu-content {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 100;
+  width: max-content;
+  white-space: nowrap;
+}
+
+.menu-item {
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  text-align: left;
+}
+
+.delete-button {
+  background-color: #e74c3c;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
+
+.delete-account-button {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.delete-account-button:hover {
+  background-color: #c0392b;
 }
