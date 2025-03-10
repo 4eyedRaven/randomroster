@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import localFont from 'next/font/local';
 import "../styles/globals.css";
 import ClientWrapper from "../components/ClientWrapper";
-import CookieConsent from "../components/CookieConsent";
 import Footer from "@/components/Footer";
 import { Suspense } from "react";
 
@@ -74,7 +73,6 @@ export default function RootLayout({
             {children}
           </Suspense>
         </ClientWrapper>
-        <CookieConsent />
         <Footer />
       </body>
     </html>

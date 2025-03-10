@@ -1,3 +1,4 @@
+// components/HamburgerMenu.tsx
 "use client";
 
 import { useState } from "react";
@@ -12,6 +13,11 @@ export default function HamburgerMenu() {
 
   const handleLogout = async () => {
     await logout();
+  };
+
+  const handleExport = () => {
+    // Opens the export API endpoint in a new tab to trigger download.
+    window.open('/api/export', '_blank');
   };
 
   return (
@@ -29,10 +35,9 @@ export default function HamburgerMenu() {
           <button onClick={handleLogout} className="menu-item">
             Log Out
           </button>
-          {/* 
-            Pass a custom class so we can style 
-            the Delete My Account button specifically
-          */}
+          <button onClick={handleExport} className="menu-item">
+            Export Data
+          </button>
           <DeleteAccountButton className="menu-item delete-button" />
         </div>
       )}

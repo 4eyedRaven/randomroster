@@ -125,6 +125,15 @@ button:disabled {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.register-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: rgba(51, 51, 51, 0.5);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 .login-form {
   display: flex;
   flex-direction: column;
@@ -202,6 +211,10 @@ select {
   border-radius: 4px;
   font-size: 1rem;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.password-input-wrapper input {
+  width: 100%;
 }
 
 input[type='text']::placeholder,
@@ -893,23 +906,63 @@ select:focus {
   bottom: 0;
   left: 0;
   right: 0;
-  background: #333;
+  background-color: #333;
   color: #fff;
   padding: 1rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap; /* Allows content to wrap on small screens */
   z-index: 1000;
 }
 
+.cookie-banner p {
+  margin: 0 1rem 0.5rem 0;
+  text-align: center;
+  flex: 1 1 100%; /* Forces the paragraph to take full width if needed */
+}
+
+.cookie-banner div {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  justify-content: center;
+}
+
 .cookie-banner button {
-  margin-left: 1rem;
   background: var(--primary-color);
   border: none;
   padding: 0.5rem 1rem;
   color: #fff;
   border-radius: 4px;
   cursor: pointer;
+}
+
+/* Hover effect for buttons */
+.cookie-banner button:hover {
+  background-color: var(--secondary-color);
+}
+
+/* Responsive Adjustments for Mobile */
+@media (max-width: 600px) {
+  .cookie-banner {
+    flex-direction: column;
+    padding: 0.75rem;
+    text-align: center;
+  }
+
+  .cookie-banner p {
+    margin: 0 0 0.75rem 0;
+  }
+
+  .cookie-banner div {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cookie-banner button {
+    width: 100%;
+  }
 }
 
 /* ===========================

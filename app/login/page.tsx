@@ -3,7 +3,7 @@
 
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { login, signup } from './actions';
+import { login } from './actions';
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -25,7 +25,9 @@ export default function LoginPage() {
       <div className="container">
         <main>
           <h1 className="title">Random Roster</h1>
-          <div className="title-description">Create groups of students for activities.</div>
+          <div className="title-description">
+            Create groups of students for activities.
+          </div>
           {emailConfirmationSent && !errorMessage && (
             <div className="notification">
               A confirmation email has been sent to your inbox. Please click the link in the email to complete your registration.
@@ -37,7 +39,7 @@ export default function LoginPage() {
             </div>
           )}
           <div className="login-container">
-            <h2>Login or Sign Up</h2>
+            <h2>Login</h2>
             <form className="login-form">
               <div className="form-group">
                 <label htmlFor="email">Email:</label>
@@ -48,8 +50,8 @@ export default function LoginPage() {
                 <input id="password" name="password" type="password" required />
               </div>
               <div className="form-buttons">
-                <button type="submit" formAction={login}>Log in</button>
-                <button type="submit" formAction={signup}>Sign up</button>
+                <button type="submit" formAction={login} className="button">Log in</button>
+                <a href="/register" className="button">Sign Up</a>
               </div>
             </form>
           </div>
