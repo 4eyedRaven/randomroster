@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Student } from "../types";
 import { HelpCircle } from "lucide-react";
+import CapabilityInfoPopover from "./CapabilityInfoPopover";
 
 interface StudentManagerProps {
   students: Student[];
@@ -98,26 +99,19 @@ export default function StudentManager({
           placeholder="New student name"
         />
 
-        <div className="capability-wrapper">
-          <select
-            value={newStudentCapability}
-            onChange={(e) =>
-              setNewStudentCapability(e.target.value as "high" | "medium" | "low")
-            }
-          >
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
-
-          {/* Wrap the icon in a span with a title attribute */}
-          <span
-            className="info-icon-wrapper"
-            title="Capability level helps create balanced groups. High=advanced, Low=needs extra help."
-          >
-            <HelpCircle size={20} className="info-icon" />
-          </span>
-        </div>
+      <div className="capability-wrapper">
+        <select
+          value={newStudentCapability}
+          onChange={(e) =>
+            setNewStudentCapability(e.target.value as "high" | "medium" | "low")
+          }
+        >
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <CapabilityInfoPopover />
+      </div>
 
         <button onClick={handleAddStudent}>Add Student</button>
       </div>

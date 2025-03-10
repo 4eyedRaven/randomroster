@@ -47,7 +47,7 @@ export default function GroupingTool({
       alert('No students available to group.');
       return;
     }
-    
+
     // Determine how many groups to create based on the selected method.
     let numGroups: number;
     if (distributedMethod === 'byGroups') {
@@ -72,7 +72,7 @@ export default function GroupingTool({
       }
       numGroups = Math.ceil(students.length / studentsPerGroup);
     }
-    
+
     // Prepare the combined list of students.
     let combinedStudents: Student[];
     if (groupingMode === 'random') {
@@ -84,12 +84,12 @@ export default function GroupingTool({
       const highStudents = students.filter((s) => s.capability_level === 'high');
       const mediumStudents = students.filter((s) => s.capability_level === 'medium');
       const lowStudents = students.filter((s) => s.capability_level === 'low');
-      
+
       const shuffle = (array: Student[]) => array.sort(() => Math.random() - 0.5);
       shuffle(highStudents);
       shuffle(mediumStudents);
       shuffle(lowStudents);
-      
+
       combinedStudents = [];
       const maxLength = Math.max(highStudents.length, mediumStudents.length, lowStudents.length);
       for (let i = 0; i < maxLength; i++) {
@@ -98,20 +98,20 @@ export default function GroupingTool({
         if (lowStudents[i]) combinedStudents.push(lowStudents[i]);
       }
     }
-    
+
     // Distribute the combined students into groups round-robin.
     const newGroups: Student[][] = Array.from({ length: numGroups }, () => []);
     combinedStudents.forEach((student, index) => {
       const groupIndex = index % numGroups;
       newGroups[groupIndex].push(student);
     });
-    
+
     // Set default group names.
     const initialGroupNames: { [key: number]: string } = {};
     newGroups.forEach((_, index) => {
       initialGroupNames[index] = `Group ${index + 1}`;
     });
-    
+
     const newGroupingId = uuidv4();
     setGroupingId(newGroupingId);
     setGroups(newGroups);
@@ -237,80 +237,143 @@ export default function GroupingTool({
   return (
     <div className="grouping-tool">
       <h2>Grouping Tool</h2>
-      
-      {/* Top-level Mode Selection */}
-      <div className="grouping-options">
-        Distribution Mode: 
-        <label>
-          <input
-            type="radio"
-            value="distributed"
-            checked={groupingMode === 'distributed'}
-            onChange={() => {
-              setGroupingMode('distributed');
-              // Reset to default sub-mode.
-              setDistributedMethod('byGroups');
-              setGroupCountInput('');
-              setGroupCount(2);
-              setInputError('');
-            }}
-          />
-          Distributed by Capability
-        </label>
-        <label>
-          <input
-            type="radio"
-            value="random"
-            checked={groupingMode === 'random'}
-            onChange={() => {
-              setGroupingMode('random');
-              // Optionally reset sub-mode for random mode.
-              setDistributedMethod('byGroups');
-              setGroupCountInput('');
-              setGroupCount(2);
-              setInputError('');
-            }}
-          />
-          Completely Random
-        </label>
-      </div>
-      
-      {/* Sub-options for grouping method (available for both modes) */}
-      {(groupingMode === 'distributed' || groupingMode === 'random') && (
-        <div className="distributed-options">
-          Grouping Method: 
+
+      {/* ========== Distribution Mode ========== */}
+
+      {/* Desktop: Radio Buttons */}
+      <div className="distribution-mode-desktop">
+        <div className="grouping-options">
+          Distribution Mode:
           <label>
             <input
               type="radio"
-              value="byGroups"
-              checked={distributedMethod === 'byGroups'}
+              value="distributed"
+              checked={groupingMode === 'distributed'}
               onChange={() => {
+                setGroupingMode('distributed');
+                // Reset to default sub-mode.
                 setDistributedMethod('byGroups');
                 setGroupCountInput('');
                 setGroupCount(2);
                 setInputError('');
               }}
             />
-            By Number of Groups
+            Distributed by Capability
           </label>
           <label>
             <input
               type="radio"
-              value="byStudents"
-              checked={distributedMethod === 'byStudents'}
+              value="random"
+              checked={groupingMode === 'random'}
               onChange={() => {
-                setDistributedMethod('byStudents');
+                setGroupingMode('random');
+                // Optionally reset sub-mode for random mode.
+                setDistributedMethod('byGroups');
                 setGroupCountInput('');
-                setStudentsPerGroup(4);
+                setGroupCount(2);
                 setInputError('');
               }}
             />
-            By Students per Group
+            Completely Random
           </label>
         </div>
+      </div>
+
+      {/* Mobile: Select Dropdown */}
+      <div className="distribution-mode-mobile">
+        <label htmlFor="distributionModeSelect">Distribution Mode:</label>
+        <select
+          id="distributionModeSelect"
+          value={groupingMode}
+          onChange={(e) => {
+            const val = e.target.value as 'distributed' | 'random';
+            setGroupingMode(val);
+            // Keep logic consistent with the radio approach
+            if (val === 'distributed') {
+              setDistributedMethod('byGroups');
+              setGroupCountInput('');
+              setGroupCount(2);
+              setInputError('');
+            } else {
+              setDistributedMethod('byGroups');
+              setGroupCountInput('');
+              setGroupCount(2);
+              setInputError('');
+            }
+          }}
+        >
+          <option value="distributed">Distributed by Capability</option>
+          <option value="random">Completely Random</option>
+        </select>
+      </div>
+
+      {/* ========== Grouping Method (sub-options) ========== */}
+
+      {(groupingMode === 'distributed' || groupingMode === 'random') && (
+        <>
+          {/* Desktop: Radio Buttons */}
+          <div className="grouping-method-desktop">
+            <div className="distributed-options">
+              Grouping Method:
+              <label>
+                <input
+                  type="radio"
+                  value="byGroups"
+                  checked={distributedMethod === 'byGroups'}
+                  onChange={() => {
+                    setDistributedMethod('byGroups');
+                    setGroupCountInput('');
+                    setGroupCount(2);
+                    setInputError('');
+                  }}
+                />
+                By Number of Groups
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="byStudents"
+                  checked={distributedMethod === 'byStudents'}
+                  onChange={() => {
+                    setDistributedMethod('byStudents');
+                    setGroupCountInput('');
+                    setStudentsPerGroup(4);
+                    setInputError('');
+                  }}
+                />
+                By Students per Group
+              </label>
+            </div>
+          </div>
+
+          {/* Mobile: Select Dropdown */}
+          <div className="grouping-method-mobile">
+            <label htmlFor="groupingMethodSelect">Grouping Method:</label>
+            <select
+              id="groupingMethodSelect"
+              value={distributedMethod}
+              onChange={(e) => {
+                const val = e.target.value as 'byGroups' | 'byStudents';
+                setDistributedMethod(val);
+                if (val === 'byGroups') {
+                  setGroupCountInput('');
+                  setGroupCount(2);
+                  setInputError('');
+                } else {
+                  setGroupCountInput('');
+                  setStudentsPerGroup(4);
+                  setInputError('');
+                }
+              }}
+            >
+              <option value="byGroups">By Number of Groups</option>
+              <option value="byStudents">By Students per Group</option>
+            </select>
+          </div>
+        </>
       )}
-      
-      {/* Input for number of groups or students per group */}
+
+      {/* ========== Group Count Input & Generate Button ========== */}
       <div className="group-count">
         <input
           type="text"
@@ -333,8 +396,8 @@ export default function GroupingTool({
         </button>
       </div>
       {inputError && <p className="error-message">{inputError}</p>}
-      
-      {/* Modal for group display */}
+
+      {/* ========== Modal for group display ========== */}
       {showModal && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { Upload } from "lucide-react";
 
 export default function ImportRosterPopover() {
   const [showPopover, setShowPopover] = useState(false);
@@ -18,6 +19,7 @@ export default function ImportRosterPopover() {
   return (
     <>
       <button type="button" onClick={handleOpen} className="menu-item">
+        <Upload size={16} style={{ marginRight: "8px" }} />
         Import Roster
       </button>
 

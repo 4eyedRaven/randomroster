@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { Trash } from "lucide-react";
 
 interface DeleteAccountButtonProps {
   className?: string; // allows us to pass extra classes from the parent
@@ -67,9 +68,9 @@ export default function DeleteAccountButton({ className }: DeleteAccountButtonPr
     <>
       <button
         onClick={() => setShowConfirmModal(true)}
-        // Merge our local style with any parent-provided className
-        className={`delete-account-button ${className || ""}`}
+        className={className}
       >
+        <Trash size={16} style={{ marginRight: "8px" }} />
         Delete My Account
       </button>
 
@@ -84,7 +85,9 @@ export default function DeleteAccountButton({ className }: DeleteAccountButtonPr
               &times;
             </button>
             <h2>Confirm Account Deletion</h2>
-            <p>Please type <strong>Delete</strong> to confirm you want to permanently delete your account.</p>
+            <p className="modal-text">
+              Please type <strong>Delete</strong> to confirm you want to permanently delete your account.
+            </p>
 
             <input
               type="text"
@@ -93,6 +96,7 @@ export default function DeleteAccountButton({ className }: DeleteAccountButtonPr
               placeholder="Type Delete"
               style={{
                 margin: "1rem 0",
+                width: "100%",
                 padding: "0.5rem",
                 border: "1px solid var(--border-color)",
                 borderRadius: "4px",
