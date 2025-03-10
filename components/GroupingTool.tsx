@@ -242,7 +242,7 @@ export default function GroupingTool({
 
       {/* Desktop: Radio Buttons */}
       <div className="distribution-mode-desktop">
-        <div className="grouping-options">
+        <div className="distributed-options">
           Distribution Mode:
           <label>
             <input
