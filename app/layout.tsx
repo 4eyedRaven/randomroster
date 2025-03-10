@@ -5,6 +5,7 @@ import "../styles/globals.css";
 import ClientWrapper from "../components/ClientWrapper";
 import Footer from "@/components/Footer";
 import { Suspense } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 // Import Geist as a local font
 const geist = localFont({
@@ -73,6 +74,7 @@ export default function RootLayout({
             {children}
           </Suspense>
         </ClientWrapper>
+        <Analytics />
         <Footer />
       </body>
     </html>
