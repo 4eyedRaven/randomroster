@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { logout } from "../app/dashboard/actions";
 import DeleteAccountButton from "./DeleteAccountButton";
+import ImportRosterPopover from "./ImportRosterPopover";
 
 export default function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +39,7 @@ export default function HamburgerMenu() {
           <button onClick={handleExport} className="menu-item">
             Export Data
           </button>
+          <ImportRosterPopover /> 
           <DeleteAccountButton className="menu-item delete-button" />
         </div>
       )}
