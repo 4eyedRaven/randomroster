@@ -235,6 +235,22 @@ select:focus {
   box-shadow: 0 0 5px var(--primary-color);
 }
 
+.notification {
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  color: var(--text-color);
+  background-color: var(--border-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.notification.error {
+  color: var(--accent-color);
+  background-color: var(--border-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 /* ===========================
    6. Class Manager Styles
 =========================== */
