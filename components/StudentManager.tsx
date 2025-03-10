@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Student } from "../types";
+import { HelpCircle } from "lucide-react";
 
 interface StudentManagerProps {
   students: Student[];
@@ -96,16 +97,28 @@ export default function StudentManager({
           onKeyDown={handleKeyDown}
           placeholder="New student name"
         />
-        <select
-          value={newStudentCapability}
-          onChange={(e) =>
-            setNewStudentCapability(e.target.value as "high" | "medium" | "low")
-          }
-        >
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
-        </select>
+
+        <div className="capability-wrapper">
+          <select
+            value={newStudentCapability}
+            onChange={(e) =>
+              setNewStudentCapability(e.target.value as "high" | "medium" | "low")
+            }
+          >
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+
+          {/* Wrap the icon in a span with a title attribute */}
+          <span
+            className="info-icon-wrapper"
+            title="Capability level helps create balanced groups. High=advanced, Low=needs extra help."
+          >
+            <HelpCircle size={20} className="info-icon" />
+          </span>
+        </div>
+
         <button onClick={handleAddStudent}>Add Student</button>
       </div>
     </div>

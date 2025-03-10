@@ -591,6 +591,58 @@ select:focus {
   padding: 0.5rem 1rem;
 }
 
+/* Flex container for radio groups */
+.grouping-options,
+.distributed-options {
+  display: flex;              /* Lay out radio labels side by side */
+  flex-wrap: wrap;            /* Allow wrapping if there’s limited space */
+  align-items: center;        /* Vertically center inputs and text */
+  gap: 1rem;                  /* Space between labels */
+  margin-bottom: 1rem;        /* Some space beneath the row of radios */
+}
+
+/* Each label wraps the radio input + text */
+.grouping-options label,
+.distributed-options label {
+  display: inline-flex;       /* Keep radio and text inline */
+  align-items: center;        /* Center vertically */
+  gap: 0.5rem;                /* Space between radio and text */
+  cursor: pointer;            /* Indicate clickable area */
+}
+
+/* You can optionally style radio inputs further if desired */
+.grouping-options input[type="radio"],
+.distributed-options input[type="radio"] {
+  accent-color: var(--primary-color); /* Change the check color (modern browsers) */
+  transform: scale(1.2);             /* Make them a bit bigger */
+  cursor: pointer;                   /* Hand cursor on hover */
+}
+
+/* Optional: if you want a bit more emphasis, you could style the text differently */
+.grouping-options label:hover,
+.distributed-options label:hover {
+  color: var(--secondary-color);
+}
+
+.capability-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-icon-wrapper {
+  display: inline-flex;
+}
+
+.info-icon {
+  cursor: pointer;
+  color: var(--accent-color);
+}
+
+.info-icon:hover {
+  color: var(--secondary-color);
+}
+
 /* ===========================
    10. Modal Styles
 =========================== */

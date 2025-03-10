@@ -23,16 +23,23 @@ export default function GroupingTool({
 }: GroupingToolProps) {
   const supabase = createClient();
 
-  const [groupingOption, setGroupingOption] = useState<'byGroups' | 'byStudents'>('byGroups');
+  // Top-level mode: either distributed by capability or completely random.
+  const [groupingMode, setGroupingMode] = useState<'distributed' | 'random'>('distributed');
+  // Only used when distributed mode is selected.
+  const [distributedMethod, setDistributedMethod] = useState<'byGroups' | 'byStudents'>('byGroups');
+  
+  // These values are used to configure the number of groups or students per group.
   const [groupCountInput, setGroupCountInput] = useState<string>('');
   const [groupCount, setGroupCount] = useState<number>(2);
   const [studentsPerGroup, setStudentsPerGroup] = useState<number>(4);
+
+  // Grouping state
   const [groups, setGroups] = useState<Student[][]>([]);
   const [groupNames, setGroupNames] = useState<{ [key: number]: string }>({});
   const [showModal, setShowModal] = useState(false);
   const [draggedStudentId, setDraggedStudentId] = useState<string | null>(null);
-  const [inputError, setInputError] = useState<string>('');
   const [groupingId, setGroupingId] = useState<string | null>(null);
+  const [inputError, setInputError] = useState<string>('');
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'shuffling' | 'completed'>('idle');
 
   const generateGroups = () => {
@@ -40,9 +47,34 @@ export default function GroupingTool({
       alert('No students available to group.');
       return;
     }
-
-    // Validate input based on grouping option
-    if (groupingOption === 'byGroups') {
+    
+    // Determine how many groups to create.
+    let numGroups: number;
+    if (groupingMode === 'distributed') {
+      if (distributedMethod === 'byGroups') {
+        if (!Number.isInteger(groupCount) || groupCount < 1) {
+          setInputError('Please enter a valid number of groups (at least 1).');
+          return;
+        }
+        if (groupCount > students.length) {
+          setInputError('Number of groups cannot exceed the number of students.');
+          return;
+        }
+        numGroups = groupCount;
+      } else {
+        // byStudents method
+        if (!Number.isInteger(studentsPerGroup) || studentsPerGroup < 1) {
+          setInputError('Please enter a valid number of students per group (at least 1).');
+          return;
+        }
+        if (studentsPerGroup > students.length) {
+          setInputError('Students per group cannot exceed the number of students.');
+          return;
+        }
+        numGroups = Math.ceil(students.length / studentsPerGroup);
+      }
+    } else {
+      // For completely random mode, we’ll use groupCount.
       if (!Number.isInteger(groupCount) || groupCount < 1) {
         setInputError('Please enter a valid number of groups (at least 1).');
         return;
@@ -51,101 +83,80 @@ export default function GroupingTool({
         setInputError('Number of groups cannot exceed the number of students.');
         return;
       }
-    } else {
-      if (!Number.isInteger(studentsPerGroup) || studentsPerGroup < 1) {
-        setInputError('Please enter a valid number of students per group (at least 1).');
-        return;
-      }
-      if (studentsPerGroup > students.length) {
-        setInputError('Students per group cannot exceed the number of students.');
-        return;
-      }
-    }
-
-    // Separate students by capability level
-    const highStudents = students.filter((s) => s.capability_level === 'high');
-    const mediumStudents = students.filter((s) => s.capability_level === 'medium');
-    const lowStudents = students.filter((s) => s.capability_level === 'low');
-
-    // Shuffle each capability group
-    const shuffle = (array: Student[]) => array.sort(() => Math.random() - 0.5);
-    shuffle(highStudents);
-    shuffle(mediumStudents);
-    shuffle(lowStudents);
-
-    // Combine all students, interleaving capability levels for balance
-    const combinedStudents: Student[] = [];
-    const maxLength = Math.max(highStudents.length, mediumStudents.length, lowStudents.length);
-    for (let i = 0; i < maxLength; i++) {
-      if (highStudents[i]) combinedStudents.push(highStudents[i]);
-      if (mediumStudents[i]) combinedStudents.push(mediumStudents[i]);
-      if (lowStudents[i]) combinedStudents.push(lowStudents[i]);
-    }
-
-    let numGroups: number;
-    if (groupingOption === 'byGroups') {
       numGroups = groupCount;
-    } else {
-      numGroups = Math.ceil(students.length / studentsPerGroup);
     }
-
-    // Initialize empty groups
+    
+    // Prepare the combined list of students.
+    let combinedStudents: Student[];
+    if (groupingMode === 'random') {
+      // Completely random: Shuffle the entire list.
+      combinedStudents = [...students];
+      combinedStudents.sort(() => Math.random() - 0.5);
+    } else {
+      // Distributed by capability.
+      const highStudents = students.filter((s) => s.capability_level === 'high');
+      const mediumStudents = students.filter((s) => s.capability_level === 'medium');
+      const lowStudents = students.filter((s) => s.capability_level === 'low');
+      
+      const shuffle = (array: Student[]) => array.sort(() => Math.random() - 0.5);
+      shuffle(highStudents);
+      shuffle(mediumStudents);
+      shuffle(lowStudents);
+      
+      combinedStudents = [];
+      const maxLength = Math.max(highStudents.length, mediumStudents.length, lowStudents.length);
+      for (let i = 0; i < maxLength; i++) {
+        if (highStudents[i]) combinedStudents.push(highStudents[i]);
+        if (mediumStudents[i]) combinedStudents.push(mediumStudents[i]);
+        if (lowStudents[i]) combinedStudents.push(lowStudents[i]);
+      }
+    }
+    
+    // Distribute the combined students into groups round-robin.
     const newGroups: Student[][] = Array.from({ length: numGroups }, () => []);
-
-    // Distribute students into groups in a round-robin fashion
     combinedStudents.forEach((student, index) => {
       const groupIndex = index % numGroups;
       newGroups[groupIndex].push(student);
     });
-
-    // Initialize default group names
+    
+    // Set default group names.
     const initialGroupNames: { [key: number]: string } = {};
     newGroups.forEach((_, index) => {
       initialGroupNames[index] = `Group ${index + 1}`;
     });
-
-    // Generate a new UUID for the grouping
+    
     const newGroupingId = uuidv4();
     setGroupingId(newGroupingId);
     setGroups(newGroups);
     setGroupNames(initialGroupNames);
-
-    // Start the animation and display the modal
     setAnimationPhase('shuffling');
     setShowModal(true);
     setInputError('');
   };
 
-  // Save grouping history into Supabase
+  // Save grouping history into Supabase (remains unchanged).
   const saveGroupingHistory = async () => {
-    if (currentClassId === null || groupingId === null) {
-      return;
-    }
-
-    // Build the grouping object to be stored
+    if (currentClassId === null || groupingId === null) return;
     const updatedGroups = groups.map((group, index) => ({
       id: String(index),
       name: groupNames[index],
       students: group,
     }));
-
     const newEntry = {
-      id: groupingId, // Use client-generated UUID as primary key
+      id: groupingId,
       class_id: currentClassId,
       timestamp: new Date().toISOString(),
-      method: groupingOption,
-      value: groupingOption === 'byGroups' ? groupCount : studentsPerGroup,
+      method: groupingMode === 'random' ? 'random' : distributedMethod,
+      value: groupingMode === 'random' ? groupCount : (distributedMethod === 'byGroups' ? groupCount : studentsPerGroup),
       number_of_students: students.length,
       groups: updatedGroups,
     };
 
-    // Use Supabase upsert to insert or update the grouping history
     const { error } = await supabase
       .from('grouping_history')
       .upsert(newEntry, { onConflict: 'id' });
-    if (error) {
-      // Removed console logging.
-      return;
+    if (!error) {
+      // Refresh grouping history if needed.
     }
   };
 
@@ -160,6 +171,7 @@ export default function GroupingTool({
     setAnimationPhase('idle');
   };
 
+  // Handle escape key to close modal.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -172,7 +184,6 @@ export default function GroupingTool({
       document.body.style.overflow = 'hidden';
       document.addEventListener('keydown', handleKeyDown);
     }
-
     return () => {
       document.body.style.overflow = 'auto';
       document.removeEventListener('keydown', handleKeyDown);
@@ -185,8 +196,6 @@ export default function GroupingTool({
 
   const handleDragEnd = (studentId: string, destinationGroupId: string) => {
     if (draggedStudentId === null) return;
-
-    // Find the index of the source group containing the dragged student
     const sourceGroupIndex = groups.findIndex((group) =>
       group.some((s) => s.id === draggedStudentId)
     );
@@ -201,10 +210,7 @@ export default function GroupingTool({
       return;
     }
 
-    // Clone groups to avoid direct mutation
     const newGroups = groups.map((group) => [...group]);
-
-    // Remove the student from the source group
     const sourceGroup = newGroups[sourceGroupIndex];
     const studentIndex = sourceGroup.findIndex((s) => s.id === draggedStudentId);
     if (studentIndex === -1) {
@@ -212,10 +218,7 @@ export default function GroupingTool({
       return;
     }
     const [movedStudent] = sourceGroup.splice(studentIndex, 1);
-
-    // Add the student to the destination group
     newGroups[destinationGroupIndex].push(movedStudent);
-
     setGroups(newGroups);
     setDraggedStudentId(null);
   };
@@ -223,12 +226,14 @@ export default function GroupingTool({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
-      if (groupingOption === 'byGroups') {
-        setGroupCountInput(value);
-        setGroupCount(value === '' ? 0 : parseInt(value, 10));
-      } else {
-        setGroupCountInput(value);
-        setStudentsPerGroup(value === '' ? 0 : parseInt(value, 10));
+      setGroupCountInput(value);
+      const num = value === '' ? 0 : parseInt(value, 10);
+      if (groupingMode === 'distributed' && distributedMethod === 'byGroups') {
+        setGroupCount(num);
+      } else if (groupingMode === 'distributed' && distributedMethod === 'byStudents') {
+        setStudentsPerGroup(num);
+      } else if (groupingMode === 'random') {
+        setGroupCount(num);
       }
       setInputError('');
     } else {
@@ -246,51 +251,94 @@ export default function GroupingTool({
   return (
     <div className="grouping-tool">
       <h2>Grouping Tool</h2>
+      
+      {/* Top-level Mode Selection */}
       <div className="grouping-options">
         <label>
           <input
             type="radio"
-            value="byGroups"
-            checked={groupingOption === 'byGroups'}
+            value="distributed"
+            checked={groupingMode === 'distributed'}
             onChange={() => {
-              setGroupingOption('byGroups');
+              setGroupingMode('distributed');
+              // Reset to default distributed sub-mode.
+              setDistributedMethod('byGroups');
               setGroupCountInput('');
               setGroupCount(2);
               setInputError('');
             }}
           />
-          By Number of Groups
+          Distributed by Capability
         </label>
         <label>
           <input
             type="radio"
-            value="byStudents"
-            checked={groupingOption === 'byStudents'}
+            value="random"
+            checked={groupingMode === 'random'}
             onChange={() => {
-              setGroupingOption('byStudents');
+              setGroupingMode('random');
               setGroupCountInput('');
-              setStudentsPerGroup(4);
+              setGroupCount(2);
               setInputError('');
             }}
           />
-          By Students per Group
+          Completely Random
         </label>
       </div>
-
+      
+      {/* Sub-options for distributed mode */}
+      {groupingMode === 'distributed' && (
+        <div className="distributed-options">
+          <label>
+            <input
+              type="radio"
+              value="byGroups"
+              checked={distributedMethod === 'byGroups'}
+              onChange={() => {
+                setDistributedMethod('byGroups');
+                setGroupCountInput('');
+                setGroupCount(2);
+                setInputError('');
+              }}
+            />
+            By Number of Groups
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="byStudents"
+              checked={distributedMethod === 'byStudents'}
+              onChange={() => {
+                setDistributedMethod('byStudents');
+                setGroupCountInput('');
+                setStudentsPerGroup(4);
+                setInputError('');
+              }}
+            />
+            By Students per Group
+          </label>
+        </div>
+      )}
+      
+      {/* Input for number of groups or students per group */}
       <div className="group-count">
         <input
           type="text"
           value={groupCountInput}
           onChange={handleInputChange}
           placeholder={
-            groupingOption === 'byGroups'
-              ? 'Number of Groups'
-              : 'Number of Students per Group'
+            groupingMode === 'distributed'
+              ? distributedMethod === 'byGroups'
+                ? 'Number of Groups'
+                : 'Number of Students per Group'
+              : 'Number of Groups'
           }
           aria-label={
-            groupingOption === 'byGroups'
-              ? 'Number of Groups'
-              : 'Number of Students per Group'
+            groupingMode === 'distributed'
+              ? distributedMethod === 'byGroups'
+                ? 'Number of Groups'
+                : 'Number of Students per Group'
+              : 'Number of Groups'
           }
           className={inputError ? 'input-error' : ''}
         />
@@ -299,21 +347,28 @@ export default function GroupingTool({
         </button>
       </div>
       {inputError && <p className="error-message">{inputError}</p>}
-
+      
+      {/* Modal for group display */}
       {showModal && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close-btn" onClick={closeModal} aria-label="Close Modal">
               &times;
             </button>
-            <h2>{animationPhase === 'completed' ? 'Generated Groups' : 'Generating Groups...'}</h2>
+            <h2>
+              {animationPhase === 'completed'
+                ? 'Generated Groups'
+                : 'Generating Groups...'}
+            </h2>
             <div className="groups-display">
               {animationPhase === 'completed' ? (
                 groups.map((group, groupIndex) => (
                   <Droppable
                     key={groupIndex}
                     id={`group-${groupIndex}`}
-                    onDrop={(studentId) => handleDragEnd(String(studentId), `group-${groupIndex}`)}
+                    onDrop={(studentId) =>
+                      handleDragEnd(String(studentId), `group-${groupIndex}`)
+                    }
                   >
                     <div className="group-card">
                       <EditableGroupName
