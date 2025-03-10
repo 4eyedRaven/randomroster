@@ -25,7 +25,7 @@ export default function GroupingTool({
 
   // Top-level mode: either distributed by capability or completely random.
   const [groupingMode, setGroupingMode] = useState<'distributed' | 'random'>('distributed');
-  // Only used when distributed mode is selected.
+  // Grouping method: by number of groups or by students per group.
   const [distributedMethod, setDistributedMethod] = useState<'byGroups' | 'byStudents'>('byGroups');
   
   // These values are used to configure the number of groups or students per group.
@@ -48,33 +48,9 @@ export default function GroupingTool({
       return;
     }
     
-    // Determine how many groups to create.
+    // Determine how many groups to create based on the selected method.
     let numGroups: number;
-    if (groupingMode === 'distributed') {
-      if (distributedMethod === 'byGroups') {
-        if (!Number.isInteger(groupCount) || groupCount < 1) {
-          setInputError('Please enter a valid number of groups (at least 1).');
-          return;
-        }
-        if (groupCount > students.length) {
-          setInputError('Number of groups cannot exceed the number of students.');
-          return;
-        }
-        numGroups = groupCount;
-      } else {
-        // byStudents method
-        if (!Number.isInteger(studentsPerGroup) || studentsPerGroup < 1) {
-          setInputError('Please enter a valid number of students per group (at least 1).');
-          return;
-        }
-        if (studentsPerGroup > students.length) {
-          setInputError('Students per group cannot exceed the number of students.');
-          return;
-        }
-        numGroups = Math.ceil(students.length / studentsPerGroup);
-      }
-    } else {
-      // For completely random mode, we’ll use groupCount.
+    if (distributedMethod === 'byGroups') {
       if (!Number.isInteger(groupCount) || groupCount < 1) {
         setInputError('Please enter a valid number of groups (at least 1).');
         return;
@@ -84,6 +60,17 @@ export default function GroupingTool({
         return;
       }
       numGroups = groupCount;
+    } else {
+      // byStudents method
+      if (!Number.isInteger(studentsPerGroup) || studentsPerGroup < 1) {
+        setInputError('Please enter a valid number of students per group (at least 1).');
+        return;
+      }
+      if (studentsPerGroup > students.length) {
+        setInputError('Students per group cannot exceed the number of students.');
+        return;
+      }
+      numGroups = Math.ceil(students.length / studentsPerGroup);
     }
     
     // Prepare the combined list of students.
@@ -93,7 +80,7 @@ export default function GroupingTool({
       combinedStudents = [...students];
       combinedStudents.sort(() => Math.random() - 0.5);
     } else {
-      // Distributed by capability.
+      // Distributed by capability: order students by capability.
       const highStudents = students.filter((s) => s.capability_level === 'high');
       const mediumStudents = students.filter((s) => s.capability_level === 'medium');
       const lowStudents = students.filter((s) => s.capability_level === 'low');
@@ -134,7 +121,7 @@ export default function GroupingTool({
     setInputError('');
   };
 
-  // Save grouping history into Supabase (remains unchanged).
+  // Save grouping history into Supabase (remains unchanged except for saving the grouping method).
   const saveGroupingHistory = async () => {
     if (currentClassId === null || groupingId === null) return;
     const updatedGroups = groups.map((group, index) => ({
@@ -146,8 +133,9 @@ export default function GroupingTool({
       id: groupingId,
       class_id: currentClassId,
       timestamp: new Date().toISOString(),
-      method: groupingMode === 'random' ? 'random' : distributedMethod,
-      value: groupingMode === 'random' ? groupCount : (distributedMethod === 'byGroups' ? groupCount : studentsPerGroup),
+      // Save the chosen grouping method regardless of the top-level mode.
+      method: distributedMethod,
+      value: distributedMethod === 'byGroups' ? groupCount : studentsPerGroup,
       number_of_students: students.length,
       groups: updatedGroups,
     };
@@ -228,12 +216,10 @@ export default function GroupingTool({
     if (/^\d*$/.test(value)) {
       setGroupCountInput(value);
       const num = value === '' ? 0 : parseInt(value, 10);
-      if (groupingMode === 'distributed' && distributedMethod === 'byGroups') {
+      if (distributedMethod === 'byGroups') {
         setGroupCount(num);
-      } else if (groupingMode === 'distributed' && distributedMethod === 'byStudents') {
+      } else {
         setStudentsPerGroup(num);
-      } else if (groupingMode === 'random') {
-        setGroupCount(num);
       }
       setInputError('');
     } else {
@@ -254,6 +240,7 @@ export default function GroupingTool({
       
       {/* Top-level Mode Selection */}
       <div className="grouping-options">
+        Distribution Mode: 
         <label>
           <input
             type="radio"
@@ -261,7 +248,7 @@ export default function GroupingTool({
             checked={groupingMode === 'distributed'}
             onChange={() => {
               setGroupingMode('distributed');
-              // Reset to default distributed sub-mode.
+              // Reset to default sub-mode.
               setDistributedMethod('byGroups');
               setGroupCountInput('');
               setGroupCount(2);
@@ -277,6 +264,8 @@ export default function GroupingTool({
             checked={groupingMode === 'random'}
             onChange={() => {
               setGroupingMode('random');
+              // Optionally reset sub-mode for random mode.
+              setDistributedMethod('byGroups');
               setGroupCountInput('');
               setGroupCount(2);
               setInputError('');
@@ -286,9 +275,10 @@ export default function GroupingTool({
         </label>
       </div>
       
-      {/* Sub-options for distributed mode */}
-      {groupingMode === 'distributed' && (
+      {/* Sub-options for grouping method (available for both modes) */}
+      {(groupingMode === 'distributed' || groupingMode === 'random') && (
         <div className="distributed-options">
+          Grouping Method: 
           <label>
             <input
               type="radio"
@@ -327,18 +317,14 @@ export default function GroupingTool({
           value={groupCountInput}
           onChange={handleInputChange}
           placeholder={
-            groupingMode === 'distributed'
-              ? distributedMethod === 'byGroups'
-                ? 'Number of Groups'
-                : 'Number of Students per Group'
-              : 'Number of Groups'
+            distributedMethod === 'byGroups'
+              ? 'Number of Groups'
+              : 'Number of Students per Group'
           }
           aria-label={
-            groupingMode === 'distributed'
-              ? distributedMethod === 'byGroups'
-                ? 'Number of Groups'
-                : 'Number of Students per Group'
-              : 'Number of Groups'
+            distributedMethod === 'byGroups'
+              ? 'Number of Groups'
+              : 'Number of Students per Group'
           }
           className={inputError ? 'input-error' : ''}
         />
