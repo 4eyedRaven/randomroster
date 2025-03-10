@@ -25,6 +25,7 @@ export default function LoginPage() {
       <div className="container">
         <main>
           <h1 className="title">Random Roster</h1>
+          <div className="title-description">Create groups of students for activities.</div>
           {emailConfirmationSent && !errorMessage && (
             <div className="notification">
               A confirmation email has been sent to your inbox. Please click the link in the email to complete your registration.

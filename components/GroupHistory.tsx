@@ -35,9 +35,7 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
       .select('*')
       .eq('class_id', currentClassId)
       .order('timestamp', { ascending: false });
-    if (error) {
-      console.error("Error fetching grouping history:", error);
-    } else if (data) {
+    if (!error && data) {
       setGroupHistory(data as GroupingHistoryEntry[]);
     }
   }, [currentClassId, supabase]);
@@ -74,7 +72,6 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
       destinationGroupIndex < 0 ||
       destinationGroupIndex >= groups.length
     ) {
-      console.error('GroupHistory: Invalid destination group index:', destinationGroupIndex);
       alert('Cannot drop the student here. Please choose a valid group.');
       return;
     }
@@ -92,7 +89,6 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
       }
     }
     if (sourceGroupIndex === -1 || !movedStudent) {
-      console.error('GroupHistory: Source group not found for student ID:', draggedStudentId);
       alert('Source group not found.');
       return;
     }
@@ -118,7 +114,6 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
   // Update the grouping history record in Supabase.
   const saveGroupingHistory = useCallback(async () => {
     if (!currentClassId || !groupingId) {
-      console.error('GroupHistory: Missing currentClassId or groupingId. Cannot save grouping history.');
       return;
     }
     const updatedGroups = groups.map((group, index) => ({
@@ -135,10 +130,7 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
       .from('grouping_history')
       .update(updatedEntry)
       .eq('id', groupingId);
-    if (error) {
-      console.error("Error updating grouping history:", error);
-    } else {
-      console.log("Grouping history updated successfully.");
+    if (!error) {
       fetchGroupingHistory();
     }
   }, [currentClassId, groupingId, groups, groupNames, supabase, fetchGroupingHistory]);
@@ -156,7 +148,6 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
   // Delete a grouping history record from Supabase.
   const handleDeleteGrouping = async (groupingIdToDelete: string) => {
     if (!currentClassId) {
-      console.error('GroupHistory: currentClassId is null. Cannot delete grouping.');
       return;
     }
     const { error } = await supabase
@@ -164,10 +155,7 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
       .delete()
       .eq('id', groupingIdToDelete)
       .eq('class_id', currentClassId);
-    if (error) {
-      console.error('Error deleting grouping:', error);
-    } else {
-      console.log(`Deleted grouping with ID ${groupingIdToDelete}`);
+    if (!error) {
       fetchGroupingHistory();
       if (selectedGrouping && selectedGrouping.id === groupingIdToDelete) {
         setSelectedGrouping(null);
@@ -294,103 +282,6 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        .group-history {
-        }
-
-        .group-history h2 {
-        }
-
-        .group-history ul {
-          list-style: none;
-          padding: 0;
-        }
-
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(0, 0, 0, 0.7);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          cursor: pointer;
-        }
-
-        .modal-content {
-          background-color: var(--bg-color);
-          padding: 1rem;
-          border-radius: 8px;
-          max-width: 90vw;
-          max-height: 90vh;
-          width: 800px;
-          position: relative;
-          color: var(--text-color);
-          cursor: default;
-          overflow-y: auto;
-        }
-
-        .modal-close-btn {
-          position: absolute;
-          top: 0.5rem;
-          right: 0.5rem;
-          background-color: transparent;
-          color: var(--text-color);
-          border: none;
-          font-size: 2rem;
-          cursor: pointer;
-        }
-
-        .modal-close-btn:hover {
-          color: var(--accent-color);
-        }
-
-        .modal-content h2 {
-          margin-top: 0;
-          color: var(--primary-color);
-        }
-
-        .groups-display {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.75rem;
-          margin-top: 1rem;
-          justify-content: center;
-        }
-
-        .group-card {
-          background-color: var(--border-color);
-          padding: 0.5rem;
-          border: 1px solid var(--border-color);
-          border-radius: 6px;
-          min-width: 120px;
-          transition: background-color 0.2s, border 0.2s, box-shadow 0.2s;
-          cursor: pointer;
-        }
-
-        .group-card:hover {
-          background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        @media (max-width: 768px) {
-          .modal-content {
-            width: 95vw;
-            padding: 0.75rem;
-          }
-
-          .groups-display {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 0.75rem;
-            margin-top: 1rem;
-            justify-items: center;
-          }
-        }
-      `}</style>
     </div>
   );
 };

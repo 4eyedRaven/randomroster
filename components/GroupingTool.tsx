@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Student, GroupingHistoryEntry } from '../types';
+import { Student } from '../types';
 import Droppable from './Droppable';
 import DraggableStudent from './DraggableStudent';
 import EditableGroupName from './EditableGroupName';
@@ -119,7 +119,6 @@ export default function GroupingTool({
   // Save grouping history into Supabase
   const saveGroupingHistory = async () => {
     if (currentClassId === null || groupingId === null) {
-      console.error('GroupingTool: currentClassId or groupingId is null. Cannot save grouping history.');
       return;
     }
 
@@ -145,9 +144,8 @@ export default function GroupingTool({
       .from('grouping_history')
       .upsert(newEntry, { onConflict: 'id' });
     if (error) {
-      console.error("Error saving grouping history:", error);
-    } else {
-      console.log("Grouping history saved successfully:", newEntry);
+      // Removed console logging.
+      return;
     }
   };
 
@@ -346,133 +344,6 @@ export default function GroupingTool({
           </div>
         </div>
       )}
-
-      {/* Inline Styles */}
-      <style jsx>{`
-        .grouping-tool {
-          margin-bottom: 2rem;
-        }
-        .grouping-tool h2 {
-          margin-bottom: 1rem;
-        }
-        .grouping-options {
-          display: flex;
-          gap: 1rem;
-          margin-bottom: 1rem;
-        }
-        .grouping-options label {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          cursor: pointer;
-        }
-        .grouping-options input[type='radio'] {
-          cursor: pointer;
-        }
-        .group-count {
-          display: flex;
-          gap: 1rem;
-          align-items: center;
-          margin-bottom: 1rem;
-        }
-        .group-count input[type='text'] {
-          width: 200px;
-          padding: 0.5rem;
-          border: 1px solid var(--border-color);
-          border-radius: 4px;
-          font-size: 1rem;
-          background-color: var(--border-color);
-          color: var(--text-color);
-        }
-        .group-count input[type='text'].input-error {
-          border-color: #e74c3c;
-          box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
-        }
-        .group-count input[type='text']::placeholder {
-          color: #cccccc;
-        }
-        .error-message {
-          color: #e74c3c;
-          margin-top: 0.5rem;
-          font-size: 0.9rem;
-        }
-        .grouping-tool button {
-          padding: 0.5rem 1rem;
-        }
-        /* Modal Styles */
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(0, 0, 0, 0.7);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          cursor: pointer;
-        }
-        .modal-content {
-          background-color: var(--bg-color);
-          padding: 1rem;
-          border-radius: 8px;
-          max-width: 90vw;
-          max-height: 90vh;
-          width: 800px;
-          position: relative;
-          color: var(--text-color);
-          cursor: default;
-          overflow-y: auto;
-        }
-        .modal-close-btn {
-          position: absolute;
-          top: 0.5rem;
-          right: 0.5rem;
-          background-color: transparent;
-          color: var(--text-color);
-          border: none;
-          font-size: 2rem;
-          cursor: pointer;
-        }
-        .modal-close-btn:hover {
-          color: var(--accent-color);
-        }
-        .modal-content h2 {
-          margin-top: 0;
-          color: var(--primary-color);
-        }
-        .groups-display {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.75rem;
-          margin-top: 1rem;
-          justify-content: center;
-        }
-        @media (max-width: 768px) {
-          .modal-content {
-            width: 95vw;
-            padding: 0.75rem;
-          }
-          .groups-display {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 0.75rem;
-            margin-top: 1rem;
-            justify-items: center;
-          }
-          .group-count input[type='text'] {
-            width: 100%;
-          }
-          .grouping-options {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-          .grouping-tool button {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

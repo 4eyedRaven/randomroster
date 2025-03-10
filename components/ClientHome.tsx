@@ -25,8 +25,6 @@ export default function ClientHome() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUser(user);
-      } else {
-        console.error("No authenticated user found.");
       }
     }
     fetchUser();
@@ -40,9 +38,7 @@ export default function ClientHome() {
           .from('classes')
           .select('*, students(*)')
           .eq('user_id', user.id);
-        if (error) {
-          console.error("Error loading classes", error);
-        } else {
+        if (!error) {
           // Transform each class so that student records already use snake_case fields.
           // (In this refactor we now expect the database to return capability_level,
           // which matches our interface.)
@@ -64,9 +60,7 @@ export default function ClientHome() {
       .from('classes')
       .insert([{ name: className, user_id: user.id }])
       .select();
-    if (error) {
-      console.error("Error adding class", error);
-    } else {
+    if (!error) {
       const newClass = data[0];
       setClasses([...classes, newClass]);
       setCurrentClassId(newClass.id);
@@ -79,9 +73,7 @@ export default function ClientHome() {
       .from('classes')
       .delete()
       .eq('id', classId);
-    if (error) {
-      console.error("Error removing class", error);
-    } else {
+    if (!error) {
       const updatedClasses = classes.filter((c) => c.id !== classId);
       setClasses(updatedClasses);
       if (currentClassId === classId) {
@@ -96,9 +88,7 @@ export default function ClientHome() {
       .from('classes')
       .update({ name: newName })
       .eq('id', classId);
-    if (error) {
-      console.error("Error renaming class", error);
-    } else {
+    if (!error) {
       const updatedClasses = classes.map((c) =>
         c.id === classId ? { ...c, name: newName } : c
       );
@@ -113,9 +103,7 @@ export default function ClientHome() {
       .from('students')
       .insert([{ class_id: currentClassId, name, capability_level, present: true }])
       .select();
-    if (error) {
-      console.error("Error adding student", error);
-    } else {
+    if (!error) {
       const newStudent = data[0];
       const updatedClasses = classes.map((c) =>
         c.id === currentClassId
@@ -133,9 +121,7 @@ export default function ClientHome() {
       .from('students')
       .delete()
       .eq('id', studentId);
-    if (error) {
-      console.error("Error removing student", error);
-    } else {
+    if (!error) {
       const updatedClasses = classes.map((c) =>
         c.id === currentClassId
           ? { ...c, students: c.students.filter((s) => s.id !== studentId) }
@@ -157,9 +143,7 @@ export default function ClientHome() {
       .from('students')
       .update({ present: newPresent })
       .eq('id', studentId);
-    if (error) {
-      console.error("Error toggling student presence", error);
-    } else {
+    if (!error) {
       const updatedClasses = classes.map((c) =>
         c.id === currentClassId
           ? {
