@@ -23,8 +23,8 @@
 html,
 body {
   height: 100%; /* Occupy the full viewport height */
-  margin: 0;    
-  padding: 0;   
+  margin: 0;
+  padding: 0;
 }
 
 main {
@@ -38,8 +38,8 @@ main {
 }
 
 body {
-  display: flex;          
-  flex-direction: column; 
+  display: flex;
+  flex-direction: column;
   font-family: var(--font-geist-sans);
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -589,7 +589,6 @@ select:focus {
 /* ===========================
    10. Modal Styles
 =========================== */
-/* The overlay is at z=1000 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -605,11 +604,11 @@ select:focus {
 }
 
 .modal-content {
-  position: relative;      /* So the close button can be positioned inside */
-  z-index: 1001;           /* Ensure it's above the overlay */
-  max-width: 90vw;         /* Shrinks to fit on small screens */
+  position: relative;
+  z-index: 1001; /* Ensure it's above the overlay */
+  max-width: 90vw;
   max-height: 90vh;
-  width: 800px;            /* Overridden on very narrow devices */
+  width: 800px;
   overflow-y: auto;
   background-color: var(--bg-color);
   padding: 1rem;
@@ -622,7 +621,7 @@ select:focus {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  z-index: 1002; /* Slightly above .modal-content */
+  z-index: 1002;
   background-color: transparent;
   color: var(--text-color);
   border: none;
@@ -831,13 +830,11 @@ select:focus {
     font-size: 1rem;
   }
 
-  /* Adjust modal-content for smaller screens */
   .modal-content {
     width: 95vw;
     padding: 0.75rem;
   }
 
-  /* Adjust group-card font sizes and padding */
   .group-card h3 {
     font-size: 1rem;
   }
@@ -850,7 +847,6 @@ select:focus {
     min-width: 120px;
   }
 
-  /* Use CSS Grid for group display */
   .groups-display {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -874,7 +870,6 @@ select:focus {
     display: block; /* Show the select dropdowns on mobile */
   }
 
-  /* Make sure the container itself is allowed to grow */
   .distribution-mode-mobile,
   .grouping-method-mobile {
     display: block;
@@ -882,7 +877,6 @@ select:focus {
     margin-bottom: 1rem;
   }
 
-  /* Force the <select> elements to fill available space */
   .distribution-mode-mobile select,
   .grouping-method-mobile select {
     width: 100%;
@@ -951,7 +945,7 @@ select:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   z-index: 1000;
 }
 .cookie-banner p {
@@ -1059,17 +1053,12 @@ select:focus {
 }
 
 /* ===========================
-   23. Additional GroupHistory 
+   23. Additional GroupHistory
 =========================== */
 .group-history ul {
   list-style: none;
   padding: 0;
 }
-
-/* ===========================
-   24. ErrorBoundary Styles
-   (Handled in #17 Additional Enhancements)
-=========================== */
 
 /* ===========================
    25. Hamburger Menu Styles
@@ -1108,4 +1097,137 @@ select:focus {
   cursor: pointer;
   padding: 0.5rem 1rem;
   text-align: left;
+}
+
+/* ===========================
+   26. Landing Page (Hero + Features)
+=========================== */
+
+/* Container for the entire marketing landing page */
+.landingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hero Section */
+.heroSection {
+  width: 100%;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--bg-color) 70%);
+  text-align: center;
+}
+
+.heroContent {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heroTitle {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+}
+
+.ctaButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ctaButtonPrimary,
+.ctaButtonSecondary {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Primary CTA (Sign Up) */
+.ctaButtonPrimary {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border: 1px solid var(--primary-color);
+}
+.ctaButtonPrimary:hover {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+/* Secondary CTA (Log In) */
+.ctaButtonSecondary {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+.ctaButtonSecondary:hover {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+/* Features Section */
+.featuresSection {
+  width: 100%;
+  padding: 3rem 1rem;
+  background-color: var(--bg-color);
+  text-align: center;
+}
+
+.featuresSection h2 {
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.featureCard {
+  background-color: var(--border-color);
+  border-radius: 8px;
+  padding: 2rem;
+  transition: transform 0.3s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+}
+
+.featureCard h3 {
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+}
+
+.featureCard p {
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+/* Responsive tweak for hero and features */
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 2.25rem;
+  }
+  .heroSubtitle {
+    font-size: 1.1rem;
+  }
 }
