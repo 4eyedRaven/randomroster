@@ -16,13 +16,14 @@ export interface Class {
 
 export interface GroupingHistoryEntry {
   id: string;
-  timestamp: string; // ISO string
+  timestamp: string;
   method: 'byGroups' | 'byStudents';
-  value: number; // Number of groups or students per group
+  value: number;
   numberOfStudents: number;
   groups: {
     id: string;
     name: string;
     students: Student[];
   }[];
+  description?: string;  // Optional description field
 }

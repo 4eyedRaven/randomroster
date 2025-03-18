@@ -1,22 +1,23 @@
-// components/GroupHistory.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import EditableGroupName from './EditableGroupName';
-import Droppable from './Droppable';
-import DraggableStudent from './DraggableStudent';
-import { GroupingHistoryEntry, Student } from '../types';
+import React, { useState, useEffect, useCallback } from "react";
+import { createClient } from "@/utils/supabase/client";
+import Droppable from "./Droppable";
+import DraggableStudent from "./DraggableStudent";
+import EditableGroupName from "./EditableGroupName";
+import GroupHistoryRow from "./GroupHistoryRow";
+import { GroupingHistoryEntry, Student } from "../types";
 
-interface GroupHistoryProps {
+export default function GroupHistory({
+  currentClassId,
+  className,
+  refreshKey,
+}: {
   currentClassId: string | null;
   className: string;
   refreshKey: number;
-}
-
-const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, refreshKey }) => {
+}) {
   const supabase = createClient();
-
   const [groupHistory, setGroupHistory] = useState<GroupingHistoryEntry[]>([]);
   const [selectedGrouping, setSelectedGrouping] = useState<GroupingHistoryEntry | null>(null);
   const [groups, setGroups] = useState<Student[][]>([]);
@@ -24,17 +25,28 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
   const [draggedStudentId, setDraggedStudentId] = useState<string | null>(null);
   const [groupingId, setGroupingId] = useState<string | null>(null);
 
-  // Wrap fetchGroupingHistory in useCallback
+  // Helper: Build fallback label from a grouping entry.
+  const buildFallbackLabel = (g: GroupingHistoryEntry) => {
+    const dateString = new Date(g.timestamp).toLocaleString();
+    const methodString =
+      g.method === "byGroups"
+        ? `${g.value} Groups`
+        : `${g.value} Students per Group`;
+    return `${dateString} - ${methodString}`;
+  };
+
+  // Fetch grouping history from Supabase
   const fetchGroupingHistory = useCallback(async () => {
     if (!currentClassId) {
       setGroupHistory([]);
       return;
     }
     const { data, error } = await supabase
-      .from('grouping_history')
-      .select('*')
-      .eq('class_id', currentClassId)
-      .order('timestamp', { ascending: false });
+      .from("grouping_history")
+      .select("*")
+      .eq("class_id", currentClassId)
+      .order("timestamp", { ascending: false });
+
     if (!error && data) {
       setGroupHistory(data as GroupingHistoryEntry[]);
     }
@@ -44,120 +56,74 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
     fetchGroupingHistory();
   }, [fetchGroupingHistory, refreshKey]);
 
-  // Load a specific grouping for editing.
+  // Opens the grouping in a modal
   const loadGrouping = (grouping: GroupingHistoryEntry) => {
     setSelectedGrouping(grouping);
-    // Deep copy groups to avoid mutation.
-    const loadedGroups = grouping.groups.map(group => [...group.students]);
+    setGroupingId(grouping.id);
+
+    // Copy groups for drag-and-drop
+    const loadedGroups = grouping.groups.map((g) => [...g.students]);
     setGroups(loadedGroups);
-    const loadedGroupNames = grouping.groups.reduce((acc, group, index) => {
-      acc[index] = group.name;
+
+    // Map groupIndex => groupName
+    const loadedGroupNames = grouping.groups.reduce((acc, grp, idx) => {
+      acc[idx] = grp.name;
       return acc;
     }, {} as { [key: number]: string });
     setGroupNames(loadedGroupNames);
-    setGroupingId(grouping.id);
+
     setDraggedStudentId(null);
   };
 
-  const handleDragStart = (studentId: string) => {
-    setDraggedStudentId(studentId);
-  };
-
-  const handleDragEnd = (studentId: string, destinationGroupId: string) => {
-    if (draggedStudentId === null || !selectedGrouping) return;
-
-    const destinationGroupIndex = parseInt(destinationGroupId.split('-')[1], 10);
-    if (
-      isNaN(destinationGroupIndex) ||
-      destinationGroupIndex < 0 ||
-      destinationGroupIndex >= groups.length
-    ) {
-      alert('Cannot drop the student here. Please choose a valid group.');
-      return;
-    }
-
-    // Clone groups to avoid state mutation.
-    const newGroups = groups.map(group => [...group]);
-    let sourceGroupIndex = -1;
-    let movedStudent: Student | null = null;
-    for (let i = 0; i < newGroups.length; i++) {
-      const index = newGroups[i].findIndex(s => s.id === draggedStudentId);
-      if (index !== -1) {
-        sourceGroupIndex = i;
-        movedStudent = newGroups[i].splice(index, 1)[0];
-        break;
-      }
-    }
-    if (sourceGroupIndex === -1 || !movedStudent) {
-      alert('Source group not found.');
-      return;
-    }
-    if (sourceGroupIndex === destinationGroupIndex) {
-      setDraggedStudentId(null);
-      return;
-    }
-    newGroups[destinationGroupIndex].push(movedStudent);
-    setGroups(newGroups);
-    if (selectedGrouping) {
-      const updatedGroups = newGroups.map((group, index) => ({
-        ...selectedGrouping.groups[index],
-        students: group,
-      }));
-      setSelectedGrouping({
-        ...selectedGrouping,
-        groups: updatedGroups,
-      });
-    }
-    setDraggedStudentId(null);
-  };
-
-  // Update the grouping history record in Supabase.
+  // Saves re-ordered groups
   const saveGroupingHistory = useCallback(async () => {
-    if (!currentClassId || !groupingId) {
-      return;
-    }
+    if (!currentClassId || !groupingId) return;
+
     const updatedGroups = groups.map((group, index) => ({
       id: String(index),
       name: groupNames[index],
       students: group,
     }));
+
     const updatedEntry = {
       timestamp: new Date().toISOString(),
       groups: updatedGroups,
-      number_of_students: groups.reduce((acc, group) => acc + group.length, 0),
+      number_of_students: groups.reduce((acc, g) => acc + g.length, 0),
+      // Do not overwrite description here.
     };
+
     const { error } = await supabase
-      .from('grouping_history')
+      .from("grouping_history")
       .update(updatedEntry)
-      .eq('id', groupingId);
+      .eq("id", groupingId);
+
     if (!error) {
       fetchGroupingHistory();
     }
   }, [currentClassId, groupingId, groups, groupNames, supabase, fetchGroupingHistory]);
 
-  // Wrap closeModal in useCallback so it can be used in useEffect
-  const closeModal = useCallback(async () => {
-    if (groupingId !== null) {
+  // Closes the modal
+  const closeModal = async () => {
+    if (groupingId) {
       await saveGroupingHistory();
     }
     setSelectedGrouping(null);
     setGroupingId(null);
     setDraggedStudentId(null);
-  }, [groupingId, saveGroupingHistory]);
+  };
 
-  // Delete a grouping history record from Supabase.
-  const handleDeleteGrouping = async (groupingIdToDelete: string) => {
-    if (!currentClassId) {
-      return;
-    }
+  // Delete a grouping
+  const handleDeleteGrouping = async (idToDelete: string) => {
+    if (!currentClassId) return;
     const { error } = await supabase
-      .from('grouping_history')
+      .from("grouping_history")
       .delete()
-      .eq('id', groupingIdToDelete)
-      .eq('class_id', currentClassId);
+      .eq("id", idToDelete)
+      .eq("class_id", currentClassId);
+
     if (!error) {
-      fetchGroupingHistory();
-      if (selectedGrouping && selectedGrouping.id === groupingIdToDelete) {
+      setGroupHistory((prev) => prev.filter((g) => g.id !== idToDelete));
+      if (selectedGrouping && selectedGrouping.id === idToDelete) {
         setSelectedGrouping(null);
         setGroups([]);
         setGroupNames({});
@@ -167,24 +133,83 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
     }
   };
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        closeModal();
-      }
-    };
-    if (selectedGrouping) {
-      document.body.style.overflow = 'hidden';
-      document.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      document.body.style.overflow = 'auto';
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [selectedGrouping, closeModal]);
+  // Edit the grouping's description
+  const handleUpdateDescription = async (groupingId: string, newDescription: string) => {
+    if (!currentClassId) return;
 
+    const { error } = await supabase
+      .from("grouping_history")
+      .update({ description: newDescription })
+      .eq("id", groupingId)
+      .eq("class_id", currentClassId);
+
+    if (error) {
+      alert("Error updating description: " + error.message);
+      return;
+    }
+    // Update local state
+    setGroupHistory((prev) =>
+      prev.map((g) => (g.id === groupingId ? { ...g, description: newDescription } : g))
+    );
+    if (selectedGrouping && selectedGrouping.id === groupingId) {
+      setSelectedGrouping({ ...selectedGrouping, description: newDescription });
+    }
+  };
+
+  // Drag-and-drop handling
+  const handleDragStart = (studentId: string) => {
+    setDraggedStudentId(studentId);
+  };
+
+  const handleDragEnd = (studentId: string, destinationGroupId: string) => {
+    if (!selectedGrouping || draggedStudentId === null) return;
+
+    const destinationIndex = parseInt(destinationGroupId.split("-")[1], 10);
+    if (
+      isNaN(destinationIndex) ||
+      destinationIndex < 0 ||
+      destinationIndex >= groups.length
+    ) {
+      alert("Cannot drop the student here. Invalid group index.");
+      return;
+    }
+
+    const newGroups = groups.map((group) => [...group]);
+    let sourceIndex = -1;
+    let movedStudent: Student | null = null;
+
+    for (let i = 0; i < newGroups.length; i++) {
+      const idx = newGroups[i].findIndex((s) => s.id === draggedStudentId);
+      if (idx !== -1) {
+        sourceIndex = i;
+        movedStudent = newGroups[i].splice(idx, 1)[0];
+        break;
+      }
+    }
+    if (sourceIndex === -1 || !movedStudent) {
+      alert("Could not find the dragged student in any group.");
+      return;
+    }
+    if (sourceIndex === destinationIndex) {
+      setDraggedStudentId(null);
+      return;
+    }
+
+    newGroups[destinationIndex].push(movedStudent);
+    setGroups(newGroups);
+
+    const updatedGroups = newGroups.map((group, index) => ({
+      ...selectedGrouping.groups[index],
+      students: group,
+    }));
+    setSelectedGrouping({ ...selectedGrouping, groups: updatedGroups });
+
+    setDraggedStudentId(null);
+  };
+
+  // Rename a group
   const handleGroupNameChange = (groupIndex: number, newName: string) => {
-    setGroupNames(prev => ({ ...prev, [groupIndex]: newName }));
+    setGroupNames((prev) => ({ ...prev, [groupIndex]: newName }));
     if (selectedGrouping) {
       const updatedGroups = selectedGrouping.groups.map((grp, idx) => {
         if (idx === groupIndex) {
@@ -196,68 +221,66 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
     }
   };
 
+  // Close modal on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeModal();
+      }
+    };
+    if (selectedGrouping) {
+      document.body.style.overflow = "hidden";
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedGrouping]);
+
   return (
     <div className="group-history">
       <h2>Previous Groupings</h2>
       {groupHistory.length === 0 ? (
         <p>No previous groupings available.</p>
       ) : (
-        <ul>
-          {groupHistory.map(grouping => (
-            <li
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {groupHistory.map((grouping) => (
+            <GroupHistoryRow
               key={grouping.id}
-              onClick={() => loadGrouping(grouping)}
-              style={{
-                cursor: 'pointer',
-                marginBottom: '0.5rem',
-                padding: '0.5rem',
-                border: '1px solid var(--border-color)',
-                borderRadius: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div>
-                <strong>{new Date(grouping.timestamp).toLocaleString()}</strong> -{' '}
-                {grouping.method === 'byGroups'
-                  ? `${grouping.value} Groups`
-                  : `${grouping.value} Students per Group`}
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteGrouping(grouping.id);
-                }}
-                style={{
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  color: '#e74c3c',
-                  cursor: 'pointer',
-                  fontSize: '1.2rem',
-                }}
-                aria-label={`Delete grouping created on ${new Date(grouping.timestamp).toLocaleString()}`}
-              >
-                &times;
-              </button>
-            </li>
+              grouping={grouping}
+              onLoadGrouping={loadGrouping}
+              onUpdateDescription={handleUpdateDescription}
+              onDeleteGrouping={handleDeleteGrouping}
+            />
           ))}
         </ul>
       )}
 
+      {/* Modal for the selected grouping */}
       {selectedGrouping && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={closeModal} aria-label="Close Modal">
+            <button
+              className="modal-close-btn"
+              onClick={closeModal}
+              aria-label="Close Modal"
+            >
               &times;
             </button>
-            <h2>Loaded Grouping</h2>
+            <h2>
+              {selectedGrouping.description?.trim()
+                ? selectedGrouping.description
+                : buildFallbackLabel(selectedGrouping)}
+            </h2>
             <div className="groups-display">
               {groups.map((group, groupIndex) => (
                 <Droppable
                   key={groupIndex}
                   id={`group-${groupIndex}`}
-                  onDrop={(studentId) => handleDragEnd(String(studentId), `group-${groupIndex}`)}
+                  onDrop={(studentId) =>
+                    handleDragEnd(String(studentId), `group-${groupIndex}`)
+                  }
                 >
                   <div className="group-card">
                     <EditableGroupName
@@ -284,6 +307,4 @@ const GroupHistory: React.FC<GroupHistoryProps> = ({ currentClassId, className, 
       )}
     </div>
   );
-};
-
-export default GroupHistory;
+}
